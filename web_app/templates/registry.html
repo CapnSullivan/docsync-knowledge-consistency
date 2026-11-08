@@ -1,0 +1,99 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Реестр терминов - docsync</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="layout">
+    <header class="page-header">
+      <div>
+        <nav class="top-nav">
+          <a href="/">Проверка документов</a>
+          <a class="active" href="/registry">Реестр терминов</a>
+        </nav>
+        <h1>Реестр терминов</h1>
+        <p class="path">Файл реестра: {{ state.registry_path }}</p>
+      </div>
+      <a class="button secondary" href="/registry">Обновить</a>
+    </header>
+
+    <section class="summary-grid">
+      <div class="summary-item">
+        <span class="summary-label">Терминов в реестре</span>
+        <strong>{{ state.entries | length }}</strong>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Источник правил</span>
+        <strong>JSON</strong>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Режим страницы</span>
+        <strong>Обзор</strong>
+      </div>
+    </section>
+
+    <section class="registry-panel">
+      <header class="section-header">
+        <div>
+          <h2>Центр правил проверки</h2>
+          <p>Эти записи определяют, какие значения считаются правильными, допустимыми или подозрительными.</p>
+        </div>
+      </header>
+
+      <div class="registry-list">
+        {% for entry in state.entries %}
+          <article class="registry-card">
+            <header class="registry-card-header">
+              <div>
+                <h3>{{ entry.key }}</h3>
+                <p>{{ entry.type }} · {{ entry.status }}</p>
+              </div>
+            </header>
+
+            <div class="registry-field">
+              <span class="field-label">Каноническое значение</span>
+              <code>{{ entry.canonical }}</code>
+            </div>
+
+            <div class="registry-field">
+              <span class="field-label">Описание</span>
+              <p>{{ entry.description }}</p>
+            </div>
+
+            <div class="registry-columns">
+              <div class="registry-field">
+                <span class="field-label">Алиасы</span>
+                {% if entry.aliases %}
+                  <div class="pill-list">
+                    {% for alias in entry.aliases %}
+                      <span class="pill">{{ alias }}</span>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <p class="muted-text">Не заданы</p>
+                {% endif %}
+              </div>
+
+              <div class="registry-field">
+                <span class="field-label">Подозрительные варианты</span>
+                {% if entry.suspicious %}
+                  <div class="pill-list">
+                    {% for suspicious in entry.suspicious %}
+                      <span class="pill warning-pill">{{ suspicious }}</span>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <p class="muted-text">Не заданы</p>
+                {% endif %}
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+</body>
+</html>

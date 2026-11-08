@@ -1,0 +1,144 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>docsync</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="layout">
+    <header class="page-header">
+      <div>
+        <nav class="top-nav"><a class="active" href="/">Проверка документов</a><a href="/registry">Реестр терминов</a></nav>`r`n        <h1>docsync</h1>
+        <p class="path">Папка проверки: {{ documents_dir }}</p>
+      </div>
+      <a class="button secondary" href="/">Проверить заново</a>
+    </header>
+
+    {% if state.status_message %}
+      <section class="notice">
+        <p>{{ state.status_message }}</p>
+        {% if state.applied_count is not none %}
+          <p>Исправлено: {{ state.applied_count }}. Пропущено: {{ state.skipped_count }}.</p>
+        {% endif %}
+        {% if state.skipped_messages %}
+          <ul>
+            {% for message in state.skipped_messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    <section class="summary-grid">
+      <div class="summary-item">
+        <span class="summary-label">Проверено документов</span>
+        <strong>{{ state.checked_documents_count }}</strong>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Документов с проблемами</span>
+        <strong>{{ state.problem_document_count }}</strong>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Всего несоответствий</span>
+        <strong>{{ state.problem_count }}</strong>
+      </div>
+    </section>
+
+    <section class="scan-documents">
+      <header class="section-header">
+        <div>
+          <h2>Документы в проверке</h2>
+          <p>Файлы, которые сканер реально читает в текущей песочнице.</p>
+        </div>
+        <strong>{{ state.scanned_documents | length }}</strong>
+      </header>
+
+      <div class="scan-document-list">
+        {% for document in state.scanned_documents %}
+          <div class="scan-document-item">
+            <span>{{ document.file_path }}</span>
+            <em>{{ document.file_extension }}</em>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    {% if not state.problem_groups %}
+      <section class="empty-state">
+        <h2>Несоответствия не обнаружены</h2>
+        <p>Текущая проверка не нашла проблем в поддерживаемых документах.</p>
+      </section>
+    {% else %}
+      <form method="post" action="/apply" class="problems-form">
+        <div class="form-actions">
+          <div>
+            <h2>Документы, требующие проверки</h2>
+            <p>Исправления применяются только к отмеченным позициям.</p>
+          </div>
+          <button class="button primary" type="submit">Исправить выбранное</button>
+        </div>
+
+        <div class="document-list">
+          {% for group in state.problem_groups %}
+            <section class="document-card">
+              <header class="document-header">
+                <div>
+                  <h3>{{ group.file_path }}</h3>
+                  <p>{{ group.file_extension }}{% if not group.can_apply_fix %} · только отчет{% endif %}</p>
+                </div>
+                <strong>{{ group.problems | length }}</strong>
+              </header>
+
+              <div class="problem-list">
+                {% for problem in group.problems %}
+                  <article class="problem-item">
+                    <label class="problem-select">
+                      <input
+                        type="checkbox"
+                        name="selected_problem"
+                        value="{{ problem.index }}"
+                        {% if not problem.can_apply_fix %}disabled{% endif %}
+                      >
+                      <span>Строка {{ problem.line_number }}</span>
+                    </label>
+
+                    <div class="problem-body">
+                      <div class="problem-meta">
+                        <span class="key">{{ problem.key }}</span>
+                        <span class="tag">{{ problem.match_type_label }}</span>
+                      </div>
+
+                      <div class="comparison-grid">
+                        <div>
+                          <span class="field-label">Найдено</span>
+                          <code>{{ problem.matched_text }}</code>
+                          {% if problem.script_note %}
+                            <div class="warning">{{ problem.script_note }}</div>
+                          {% endif %}
+                        </div>
+                        <div>
+                          <span class="field-label">Должно быть</span>
+                          <code>{{ problem.expected_text }}</code>
+                        </div>
+                      </div>
+
+                      <div class="context-block">
+                        <span class="field-label">Контекст</span>
+                        <blockquote>{{ problem.context }}</blockquote>
+                      </div>
+                    </div>
+                  </article>
+                {% endfor %}
+              </div>
+            </section>
+          {% endfor %}
+        </div>
+      </form>
+    {% endif %}
+  </main>
+</body>
+</html>
+
