@@ -1,0 +1,40 @@
+﻿[
+  {
+    "key": "game.title",
+    "type": "project_title",
+    "canonical": "Game about of might and magik",
+    "description": "Каноническое рабочее название игры. Стилизация magik является частью идентичности проекта.",
+    "aliases": [],
+    "suspicious": [
+      "Game about might and magic",
+      "Game About of Might and Magik"
+    ],
+    "status": "active"
+  },
+  {
+    "key": "game.short_description",
+    "type": "project_description",
+    "canonical": "A tactical fantasy adventure about heroes, armies, spells, and ancient kingdoms.",
+    "description": "Каноническое короткое описание проекта для внутренних сводок и внешних черновиков.",
+    "aliases": [],
+    "suspicious": [
+      "A tactical fantasy game about heroes, armies and spells."
+    ],
+    "status": "active"
+  },
+  {
+    "key": "term.mana",
+    "type": "game_term",
+    "canonical": "mana",
+    "description": "Игровой ресурс, который тратится на применение заклинаний и магических способностей.",
+    "aliases": [
+      "Mana",
+      "мана"
+    ],
+    "suspicious": [
+      "mane",
+      "манна"
+    ],
+    "status": "active"
+  }
+]
